@@ -12,7 +12,7 @@ next()
 },
 async(req:Request,res:Response,next:NextFunction)=>{
 try{
-    console.log("something")
+    console.log(something)
     res.send('Hello World!! I am learning Express and MongoDB.')
 
 }
