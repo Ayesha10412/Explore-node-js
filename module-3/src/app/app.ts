@@ -1,30 +1,33 @@
-import express, { Application, Request, Response } from 'express'
-import fs from "fs"
-import path from 'path'
+import express, { Application, NextFunction, Request, Response } from 'express'
 import { todosRouter } from './todos/todosRoute'
 const app:Application = express()
 app.use(express.json())
 const userRouter = express.Router()
 app.use("/todos",todosRouter)
 app.use("/users",userRouter)
-todosRouter.get('/todos',(req:Request, res:Response)=>{
-   
-    const data = fs.readFileSync(filePath,{encoding:"utf-8"})
-  console.log("From todos router")
-    res.json({
-        message:"From Todos Router",data
-    })
+
+app.get('/error',(req:Request,res:Response,next:NextFunction)=>{
+console.log("I am custom middleware!")
+next()
+},
+async(req:Request,res:Response,next:NextFunction)=>{
+try{
+    console.log("something")
+    res.send('Hello World!! I am learning Express and MongoDB.')
+
+}
+catch(error){
+  next(error)
+}
 })
-const filePath = path.join(__dirname, "../../db/todo.json")
-app.get('/',(req:Request,res:Response)=>{
-res.send('Hello World!! I am learning Express and MongoDB.')
+app.use((req,res,next)=>{
+    res.status(404).json({message:"Route not found!!"})
 })
-app.get('/todos/:id',(req:Request, res:Response)=>{
-    console.log("From Query:",req.query)
-    console.log("From Params:",req.params)
-    const data = fs.readFileSync(filePath,{encoding:"utf-8"})
-//   console.log(data)
-    res.json(data)
+app.use((error:any,req:Request,res:Response,next:NextFunction)=>{
+    if(error){
+        console.log("error",error)
+        res.status(400).json({message:"Something went wrong",error})
+    }
 })
 
 export default app;
